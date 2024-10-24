@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat APP</title>
+    <style>
+        body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  
+        #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+        #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+        #input:focus { outline: none; }
+        #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+  
+        #messages { list-style-type: none; margin: 0; padding: 0; }
+        #messages > li { padding: 0.5rem 1rem; }
+        #messages > li:nth-child(odd) { background: #efefef; }
+      </style>
+  </head>
+  <body>
+    <h1>Chatting</h1>
+
+    <input type="text" id="message" placeholder="Enter Message" />
+    <button id="sendBtn">Send</button>
+    <button id="toggle-btn">Disconnect</button>
+    <script>
+        const toggleButton = document.getElementById('toggle-btn');
+      
+        toggleButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (socket.connected) {
+            toggleButton.innerText = 'Connect';
+            socket.disconnect();
+          } else {
+            toggleButton.innerText = 'Disconnect';
+            socket.connect();
+          }
+        });
+      </script>
+    <div id="messages"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const sendBtn = document.getElementById("sendBtn");
+      const messageInput = document.getElementById("message");
+      const allMessages = document.getElementById("messages");
+
+      socket.on("message", (message) => {
+        const p = document.createElement("li");
+        p.textContent = message;
+        allMessages.appendChild(p);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      sendBtn.addEventListener("click", (e) => {
+        const message = messageInput.value;
+        console.log(message);
+        socket.timeout(5000).emit("user-message", message);
+        messageInput.value='';
+      });
+    </script>
+  </body>
+</html>
